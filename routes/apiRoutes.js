@@ -39,3 +39,5 @@ router
       if (err) console.log(err);
     });
   });
+
+module.exports = router;
