@@ -8,6 +8,13 @@ function readDB() {
   });
 }
 
+function writeDB(toWrite) {
+  fs.writeFile("../db/db.json", toWrite, (err) => {
+    if (err) console.log(err);
+  });
+}
+let idIterator = 1;
+
 router
   .route("api/notes/:id")
   .get((_, res) => {
@@ -16,13 +23,14 @@ router
   })
   .post((req, res) => {
     const newNote = JSON.parse(req.body);
-    iterator = 1;
-    newNote.id = iterator;
-    iterator++;
+    newNote.id = idIterator;
+    idIterator++;
     const noteJSON = JSON.stringify(newNote);
-    fs.appendFile("../db/db.json", noteJSON, (err) => {
-      if (err) console.log(err);
-    });
+    const oldNote = readDB();
+    const notesArr = JSON.parse(oldNote);
+    notesArr.push(newNote);
+    const noteJSON = JSON.stringify(notesArr);
+    writeDB(notesArr);
     res.json(noteJSON);
   })
   .delete((_req, _res) => {
@@ -35,9 +43,7 @@ router
     });
     noteArr.splice(toDel, 1);
     const newJSON = JSON.parse(noteArr);
-    fs.writeFile("../db/db.json", newJSON, (err) => {
-      if (err) console.log(err);
-    });
+    writeDB(newJSON);
   });
 
 module.exports = router;
