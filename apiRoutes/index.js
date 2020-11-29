@@ -2,6 +2,8 @@ const router = require("express").Router();
 const fs = require("fs");
 const path = require("path");
 
+var date = new Date();
+
 function readDB() {
   return fs.readFileSync(
     path.join(__dirname, "..", "db", "db.json"),
@@ -10,14 +12,12 @@ function readDB() {
       if (err) {
         console.error(err);
       }
-      console.log("data :>> ", data);
       return data;
     }
   );
 }
 
 function writeDB(toWrite) {
-  console.log("toWrite :>> ", toWrite);
   fs.writeFileSync(
     path.join(__dirname, "..", "db", "db.json"),
     toWrite,
@@ -26,7 +26,6 @@ function writeDB(toWrite) {
     }
   );
 }
-let idIterator = 1;
 
 router
   .route("/api/notes")
@@ -35,10 +34,12 @@ router
   })
   .post((req, res) => {
     const newNote = req.body;
-    newNote.id = idIterator;
-    idIterator++;
+    // found this quasi-unique id generator at
+    // https://stackoverflow.com/questions/8012002/create-a-unique-number-with-javascript-time
+    // will be unique for this, but can add Math.random to it to make it more unique
+    // if there will be more server calls in the same millisecond.
+    newNote.id = date.getTime();
     const newNoteJSON = JSON.stringify(newNote);
-    console.log("newNoteJSON :>> ", newNoteJSON);
     const bab = readDB();
     const notesArr = JSON.parse(readDB());
     notesArr.push(newNote);
@@ -46,15 +47,22 @@ router
     writeDB(notesJSON);
     res.json(newNote);
   });
-router.route("api/notes/:id").delete((_req, _res) => {
+router.route("/api/notes/:noteID").delete((req, res) => {
+  console.log("req.body :>> ", req.body);
+  console.log("noteID :>> ", req.params.noteID);
   noteArr = JSON.parse(readDB());
-  const toDel = noteArr.forEach((note, idx) => {
-    if ((note.id = id)) {
-      return idx;
+  console.log("noteArr :>> ", noteArr);
+  let toDel;
+  noteArr.forEach((note, idx) => {
+    if ((note.id = req.params.noteID)) {
+      console.log("idx :>> ", idx);
+      toDel = idx;
     }
   });
-  noteArr.splice(toDel(), 1);
-  const newJSON = JSON.parse(noteArr);
+  console.log("toDel :>> ", toDel);
+  noteArr.splice(toDel, 1);
+  console.log("noteArr :>> ", noteArr);
+  const newJSON = JSON.stringify(noteArr);
   writeDB(newJSON);
 });
 
