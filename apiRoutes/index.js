@@ -2,6 +2,7 @@ const router = require("express").Router();
 const fs = require("fs");
 const path = require("path");
 
+// date will be used to create a 'unique' id for each item
 var date = new Date();
 
 function readDB() {
@@ -34,19 +35,17 @@ router
   })
   .post((req, res) => {
     const newNote = req.body;
-    // found this quasi-unique id generator at
-    // https://stackoverflow.com/questions/8012002/create-a-unique-number-with-javascript-time
-    // will be unique for this, but can add Math.random to it to make it more unique
-    // if there will be more server calls in the same millisecond.
+    /* found this quasi-unique id generator at
+    https://stackoverflow.com/questions/8012002/create-a-unique-number-with-javascript-time
+    the id will be unique for this application, but can add Math.random to it 
+    to make it more unique if there will be more server calls in the same millisecond. */
     newNote.id = date.getTime();
-    const newNoteJSON = JSON.stringify(newNote);
-    const bab = readDB();
     const notesArr = JSON.parse(readDB());
     notesArr.push(newNote);
-    const notesJSON = JSON.stringify(notesArr);
-    writeDB(notesJSON);
+    writeDB(JSON.stringify(notesArr));
     res.json(newNote);
   });
+// not sure if this is possible in the same router.route as above
 router.route("/api/notes/:noteID").delete((req, res) => {
   noteArr = JSON.parse(readDB());
   let toDel;
@@ -56,8 +55,7 @@ router.route("/api/notes/:noteID").delete((req, res) => {
     }
   });
   noteArr.splice(toDel, 1);
-  const newJSON = JSON.stringify(noteArr);
-  writeDB(newJSON);
+  writeDB(JSON.stringify(noteArr));
   res.sendStatus(204);
 });
 
