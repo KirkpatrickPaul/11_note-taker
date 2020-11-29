@@ -102,9 +102,9 @@ const handleRenderSaveBtn = function () {
 };
 
 // Render's the list of note titles
-const renderNoteList = (notes) => {
+const renderNoteList = (notesJSON) => {
   $noteList.empty();
-
+  const notes = JSON.parse(notesJSON);
   const noteListItems = [];
 
   // Returns jquery object for li with given text and delete button

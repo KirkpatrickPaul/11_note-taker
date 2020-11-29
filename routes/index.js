@@ -28,29 +28,32 @@ function writeDB(toWrite) {
 }
 let idIterator = 1;
 
-router.route("/api/notes").post((req, res) => {
-  const newNote = req.body;
-  newNote.id = idIterator;
-  idIterator++;
-  const newNoteJSON = JSON.stringify(newNote);
-  const bab = readDB();
-  console.log("readDB() :>> ", readDB());
-  const notesArr = JSON.parse(readDB());
-  console.log("notesArr :>> ", notesArr);
-  notesArr.push(newNote);
-  const notesJSON = JSON.stringify(notesArr);
-  writeDB(notesJSON);
-  res.json(newNoteJSON);
-});
+router
+  .route("/api/notes")
+  .get((_, res) => {
+    res.json(readDB());
+  })
+  .post((req, res) => {
+    const newNote = req.body;
+    newNote.id = idIterator;
+    idIterator++;
+    const newNoteJSON = JSON.stringify(newNote);
+    console.log("newNoteJSON :>> ", newNoteJSON);
+    const bab = readDB();
+    const notesArr = JSON.parse(readDB());
+    notesArr.push(newNote);
+    const notesJSON = JSON.stringify(notesArr);
+    writeDB(notesJSON);
+    res.json(newNote);
+  });
 router.route("api/notes/:id").delete((_req, _res) => {
-  notesJSON = readDB();
-  noteArr = JSON.parse(notesJSON);
+  noteArr = JSON.parse(readDB());
   const toDel = noteArr.forEach((note, idx) => {
     if ((note.id = id)) {
       return idx;
     }
   });
-  noteArr.splice(toDel, 1);
+  noteArr.splice(toDel(), 1);
   const newJSON = JSON.parse(noteArr);
   writeDB(newJSON);
 });
