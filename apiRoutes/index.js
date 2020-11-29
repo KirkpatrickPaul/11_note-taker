@@ -48,22 +48,17 @@ router
     res.json(newNote);
   });
 router.route("/api/notes/:noteID").delete((req, res) => {
-  console.log("req.body :>> ", req.body);
-  console.log("noteID :>> ", req.params.noteID);
   noteArr = JSON.parse(readDB());
-  console.log("noteArr :>> ", noteArr);
   let toDel;
   noteArr.forEach((note, idx) => {
     if ((note.id = req.params.noteID)) {
-      console.log("idx :>> ", idx);
       toDel = idx;
     }
   });
-  console.log("toDel :>> ", toDel);
   noteArr.splice(toDel, 1);
-  console.log("noteArr :>> ", noteArr);
   const newJSON = JSON.stringify(noteArr);
   writeDB(newJSON);
+  res.sendStatus(204);
 });
 
 module.exports = router;
