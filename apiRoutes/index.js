@@ -31,6 +31,7 @@ function writeDB(toWrite) {
 router
   .route("/api/notes")
   .get((_, res) => {
+    res.status(200);
     res.json(readDB());
   })
   .post((req, res) => {
@@ -43,9 +44,10 @@ router
     const notesArr = JSON.parse(readDB());
     notesArr.push(newNote);
     writeDB(JSON.stringify(notesArr));
+    res.status(200);
     res.json(newNote);
   });
-// not sure if this is possible in the same router.route as above
+// not sure if this is possible in the same router.route as above.
 router.route("/api/notes/:noteID").delete((req, res) => {
   noteArr = JSON.parse(readDB());
   let toDel;
